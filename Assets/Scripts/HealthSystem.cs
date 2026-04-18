@@ -4,10 +4,19 @@ public class HealthSystem : MonoBehaviour
 {
     public int maxHP = 100;
     public int currenHP;
-    public event System.Action OnDeadth;
+    public GameObject healthBarPrefab;
+    public Vector3 barOffset = new Vector3(0, -0.7f, 0);
+    private HealthBar healthBar;
     void Start()
     {
         currenHP = maxHP;
+        if (healthBarPrefab != null)
+        {
+            var barObj = Instantiate(healthBarPrefab);
+            healthBar = barObj.GetComponent<HealthBar>();
+            healthBar.Setup(transform, barOffset);
+            healthBar.UpdateBar(currenHP, maxHP);
+        }
     }
     void Update()
     {
@@ -15,10 +24,10 @@ public class HealthSystem : MonoBehaviour
     }
     public void TakeDamage(int amount)
     {
-        currenHP -= amount;
+        currenHP = Mathf.Max(0, currenHP - amount);
+        healthBar?.UpdateBar(currenHP, maxHP);
         if (currenHP <= 0)
         {
-            OnDeadth.Invoke();
             Die();
         }
     }
