@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 
 public class PlayerController : MonoBehaviour
 {
@@ -33,6 +34,10 @@ public class PlayerController : MonoBehaviour
         else if (moveInput.x < 0)
         {
             transform.localScale = new Vector3(-1, 1, 1);
+        }
+        if (inputActions.Player.Attack.WasPressedThisFrame())
+        {
+            anim.SetTrigger("Attack");
         }
         UpdateAnimation();
     }
