@@ -35,10 +35,10 @@ public class PlayerController : MonoBehaviour
         {
             transform.localScale = new Vector3(-1, 1, 1);
         }
-        if (inputActions.Player.Attack.WasPressedThisFrame()) 
-    {
-        anim.SetTrigger("Attack");
-    }
+        if (inputActions.Player.Attack.WasPressedThisFrame())
+        {
+            anim.SetTrigger("Attack");
+        }
         UpdateAnimation();
     }
     void FixedUpdate()

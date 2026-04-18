@@ -11,12 +11,12 @@ public class HealthSystem : MonoBehaviour
     }
     void Update()
     {
-        
+
     }
     public void TakeDamage(int amount)
     {
         currenHP -= amount;
-        if(currenHP <= 0)
+        if (currenHP <= 0)
         {
             OnDeadth.Invoke();
             Die();
@@ -24,9 +24,6 @@ public class HealthSystem : MonoBehaviour
     }
     public void Die()
     {
-        if (gameObject.CompareTag("Enemy"))
-        {
-            Destroy(gameObject);
-        }
+        Destroy(gameObject);
     }
 }
