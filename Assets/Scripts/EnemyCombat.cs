@@ -10,4 +10,8 @@ public class EnemyCombat : MonoBehaviour
             collision.gameObject.GetComponent<HealthSystem>().TakeDamage(damage);
         }
     }
+    public void Attack()
+    {
+        
+    }
 }
