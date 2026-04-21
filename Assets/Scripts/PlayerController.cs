@@ -89,6 +89,15 @@ public class PlayerController : MonoBehaviour
         anim.SetFloat(HashMoveX, lastMoveDir.x);
         anim.SetFloat(HashMoveY, lastMoveDir.y);
         anim.SetBool(HashIsMoving, moving && !isAttacking);
+        FlipByDirection();
+    }
+
+    private void FlipByDirection()
+    {
+        if (lastMoveDir.x > 0.01f)
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        else if (lastMoveDir.x < -0.01f)
+            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
     }
 
     private void OnAttackPerformed(InputAction.CallbackContext ctx)
@@ -104,7 +113,7 @@ public class PlayerController : MonoBehaviour
     private void PositionHitbox()
     {
         if (attackHitbox == null) return;
-        attackHitbox.transform.localPosition = lastMoveDir.normalized * 0.7f;
+        attackHitbox.transform.position = transform.position + (Vector3)(lastMoveDir.normalized * 0.7f);
     }
 
     public void EnableHitbox()
