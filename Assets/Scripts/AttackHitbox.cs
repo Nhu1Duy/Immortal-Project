@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class AttackHitbox : MonoBehaviour
 {
     private PlayerController owner;
+    private readonly HashSet<Collider2D> hitTargets = new HashSet<Collider2D>();
 
     private void Awake()
     {
@@ -10,9 +12,17 @@ public class AttackHitbox : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    private void OnEnable()
+    {
+        hitTargets.Clear();
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Enemy")) return;
+
+        if (hitTargets.Contains(other)) return;
+        hitTargets.Add(other);
 
         HealthSystem enemyHP = other.GetComponent<HealthSystem>();
         if (enemyHP == null)
@@ -22,6 +32,7 @@ public class AttackHitbox : MonoBehaviour
         {
             int dmg = owner != null ? owner.AttackDamage : 25;
             enemyHP.TakeDamage(dmg);
+
             Rigidbody2D enemyRb = other.GetComponentInParent<Rigidbody2D>();
             if (enemyRb != null)
             {
