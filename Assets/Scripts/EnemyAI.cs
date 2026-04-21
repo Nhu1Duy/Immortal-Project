@@ -54,7 +54,11 @@ public class EnemyAI : MonoBehaviour
             Collider2D enemyCol = GetComponent<Collider2D>();
             if (enemyCol != null)
             {
-                foreach (Collider2D playerCol in playerObj.GetComponentsInChildren<Collider2D>())
+                Collider2D[] allPlayerCols = playerObj.GetComponentsInChildren<Collider2D>(true);
+                var rootCols = playerObj.GetComponents<Collider2D>();
+                foreach (Collider2D playerCol in rootCols)
+                    Physics2D.IgnoreCollision(playerCol, enemyCol, true);
+                foreach (Collider2D playerCol in allPlayerCols)
                     Physics2D.IgnoreCollision(playerCol, enemyCol, true);
             }
         }
@@ -76,7 +80,7 @@ public class EnemyAI : MonoBehaviour
             health.OnDeath -= HandleDeath;
     }
 
-    private Vector2 moveDir; 
+    private Vector2 moveDir;
 
     private void Update()
     {

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3826156325808182853}
   - component: {fileID: 3675086528336940398}
   - component: {fileID: 2043037677032781057}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' HPBar_Canvas'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -91,7 +91,7 @@ GameObject:
   - component: {fileID: 6739996712607692870}
   - component: {fileID: 2452002814768556840}
   - component: {fileID: 985492351947681769}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -258,14 +258,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc01cabf7ac29a94abbd60f6da9aca0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
-  detectionRange: 5
+  detectionRange: 10
   attackRange: 2
   moveSpeed: 4
   attackDamage: 15
   attackCooldown: 1.2
   doPatrol: 1
   patrolRange: 3
-  patrolSpeed: 1.5
+  patrolSpeed: 3
 --- !u!114 &2452002814768556840
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -313,7 +313,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2541927229408024787}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -351,7 +351,7 @@ GameObject:
   - component: {fileID: 3580796012200204645}
   - component: {fileID: 3101847166688919515}
   - component: {fileID: 7772957396014511294}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -425,7 +425,7 @@ GameObject:
   m_Component:
   - component: {fileID: 383888458577287698}
   - component: {fileID: 7057310775921821662}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -515,7 +515,7 @@ GameObject:
   - component: {fileID: 902144049561394370}
   - component: {fileID: 8387488989901100285}
   - component: {fileID: 888961748142016388}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}

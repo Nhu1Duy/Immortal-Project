@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 830053777161674598}
   - component: {fileID: 639822264153319402}
   - component: {fileID: 4186751467588085261}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Attack_Hitbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -106,7 +106,7 @@ GameObject:
   - component: {fileID: 6129598247917722295}
   - component: {fileID: 7146721847503168036}
   - component: {fileID: 1448538563127256496}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
