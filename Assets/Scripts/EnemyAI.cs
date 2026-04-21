@@ -51,7 +51,11 @@ public class EnemyAI : MonoBehaviour
         spawnPos = transform.position;
         patrolTarget = (Vector2)spawnPos + Random.insideUnitCircle * patrolRange;
 
-        health.OnDeath += HandleDeath;
+        if (health != null)
+            health.OnDeath += HandleDeath;
+        else
+            Debug.LogWarning($"[EnemyAI] {gameObject.name}: HealthSystem không tìm thấy!", this);
+        attackTimer = attackCooldown;
     }
 
     private void OnDestroy()
@@ -59,6 +63,8 @@ public class EnemyAI : MonoBehaviour
         if (health != null)
             health.OnDeath -= HandleDeath;
     }
+
+    private Vector2 moveDir; 
 
     private void Update()
     {
@@ -72,6 +78,8 @@ public class EnemyAI : MonoBehaviour
         switch (state)
         {
             case EnemyState.Idle:
+                anim.SetBool(HashIsMoving, false);
+                moveDir = Vector2.zero;
                 if (distToPlayer <= detectionRange)
                     state = EnemyState.Chase;
                 else if (doPatrol)
@@ -80,37 +88,47 @@ public class EnemyAI : MonoBehaviour
 
             case EnemyState.Chase:
                 if (distToPlayer <= attackRange)
+                {
                     state = EnemyState.Attack;
+                    moveDir = Vector2.zero;
+                }
                 else if (distToPlayer > detectionRange * 1.5f)
+                {
                     state = EnemyState.Idle;
+                    moveDir = Vector2.zero;
+                }
                 else
                     ChasePlayer();
                 break;
 
             case EnemyState.Attack:
-                rb.linearVelocity = Vector2.zero;
+                moveDir = Vector2.zero;
                 anim.SetBool(HashIsMoving, false);
 
                 if (distToPlayer > attackRange)
-                {
                     state = EnemyState.Chase;
-                }
                 else if (attackTimer <= 0f)
-                {
                     PerformAttack();
-                }
                 break;
         }
+    }
+
+    private void FixedUpdate()
+    {
+        if (state == EnemyState.Dead) return;
+        if (moveDir.sqrMagnitude > 0.01f)
+            rb.MovePosition(rb.position + moveDir * Time.fixedDeltaTime);
     }
 
     private void ChasePlayer()
     {
         Vector2 dir = ((Vector2)player.position - rb.position).normalized;
-        rb.MovePosition(rb.position + dir * moveSpeed * Time.deltaTime);
+        moveDir = dir * moveSpeed;
 
         anim.SetFloat(HashMoveX, dir.x);
         anim.SetFloat(HashMoveY, dir.y);
         anim.SetBool(HashIsMoving, true);
+        FlipByDirection(dir.x);
     }
 
     private void Patrol()
@@ -121,14 +139,24 @@ public class EnemyAI : MonoBehaviour
         if (dist < 0.2f)
         {
             patrolTarget = (Vector2)spawnPos + Random.insideUnitCircle * patrolRange;
+            moveDir = Vector2.zero;
         }
         else
         {
-            rb.MovePosition(rb.position + dir * patrolSpeed * Time.deltaTime);
+            moveDir = dir * patrolSpeed;
             anim.SetFloat(HashMoveX, dir.x);
             anim.SetFloat(HashMoveY, dir.y);
             anim.SetBool(HashIsMoving, true);
+            FlipByDirection(dir.x);
         }
+    }
+
+    private void FlipByDirection(float dirX)
+    {
+        if (dirX > 0.01f)
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        else if (dirX < -0.01f)
+            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
     }
 
     private void PerformAttack()
