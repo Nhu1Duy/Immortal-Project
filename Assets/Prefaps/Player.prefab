@@ -289,7 +289,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47196b926840ffd46ba6d417b43aa77b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthSystem
-  maxHP: 100
+  maxHP: 90
   spriteRenderer: {fileID: 926513166433299245}
   damageFlashColor: {r: 0.97735846, g: 0.8611819, b: 0.8611819, a: 1}
   flashDuration: 0.5
