@@ -260,7 +260,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
   detectionRange: 5
   attackRange: 2
-  moveSpeed: 5.2
+  moveSpeed: 4
   attackDamage: 15
   attackCooldown: 1.2
   doPatrol: 1

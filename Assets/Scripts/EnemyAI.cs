@@ -41,12 +41,23 @@ public class EnemyAI : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         health = GetComponent<HealthSystem>();
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
     }
 
     private void Start()
     {
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj != null) player = playerObj.transform;
+        if (playerObj != null)
+        {
+            player = playerObj.transform;
+
+            Collider2D enemyCol = GetComponent<Collider2D>();
+            if (enemyCol != null)
+            {
+                foreach (Collider2D playerCol in playerObj.GetComponentsInChildren<Collider2D>())
+                    Physics2D.IgnoreCollision(playerCol, enemyCol, true);
+            }
+        }
 
         spawnPos = transform.position;
         patrolTarget = (Vector2)spawnPos + Random.insideUnitCircle * patrolRange;
@@ -55,6 +66,7 @@ public class EnemyAI : MonoBehaviour
             health.OnDeath += HandleDeath;
         else
             Debug.LogWarning($"[EnemyAI] {gameObject.name}: HealthSystem không tìm thấy!", this);
+
         attackTimer = attackCooldown;
     }
 
@@ -163,12 +175,19 @@ public class EnemyAI : MonoBehaviour
     {
         attackTimer = attackCooldown;
         anim.SetTrigger(HashAttack);
+    }
+
+    public void DealDamage()
+    {
+        if (state == EnemyState.Dead) return;
+        if (player == null) return;
+
+        float dist = Vector2.Distance(transform.position, player.position);
+        if (dist > attackRange * 1.5f) return;
 
         HealthSystem playerHP = player.GetComponent<HealthSystem>();
         if (playerHP != null && !playerHP.IsDead)
-        {
             playerHP.TakeDamage(attackDamage);
-        }
     }
 
     private void HandleDeath()
