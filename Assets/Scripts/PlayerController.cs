@@ -1,62 +1,148 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.LowLevel;
 
 public class PlayerController : MonoBehaviour
 {
-    public float moveSpeed = 5f;
+    [Header("Movement")]
+    [SerializeField] private float moveSpeed = 5f;
+
+    [Header("Combat")]
+    [SerializeField] private int attackDamage = 25;
+    [SerializeField] private float attackCooldown = 0.5f;
+    [SerializeField] private GameObject attackHitbox;
+
     private Rigidbody2D rb;
     private Animator anim;
-    private Vector2 moveInput;
+    private HealthSystem health;
     private PlayerInputActions inputActions;
 
-    void Awake()
+    private Vector2 moveInput;
+    private Vector2 lastMoveDir = Vector2.down;
+    private float attackTimer;
+    private bool isAttacking;
+    private bool isDead;
+
+    private static readonly int HashMoveX = Animator.StringToHash("MoveX");
+    private static readonly int HashMoveY = Animator.StringToHash("MoveY");
+    private static readonly int HashIsMoving = Animator.StringToHash("IsMoving");
+    private static readonly int HashAttack = Animator.StringToHash("Attack");
+    private static readonly int HashDie = Animator.StringToHash("Die");
+
+    private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-
+        health = GetComponent<HealthSystem>();
         inputActions = new PlayerInputActions();
     }
-    void OnEnable() => inputActions.Player.Enable();
-    void OnDisable() => inputActions.Player.Disable();
-    void Start()
-    {
 
+    private void OnEnable()
+    {
+        inputActions.Enable();
+
+        inputActions.Player.Move.performed += OnMove;
+        inputActions.Player.Move.canceled += OnMove;
+
+        inputActions.Player.Attack.performed += OnAttackPerformed;
+
+        if (health != null)
+            health.OnDeath += HandleDeath;
     }
 
-    void Update()
+    private void OnDisable()
     {
-        moveInput = inputActions.Player.Move.ReadValue<Vector2>();
-        if (moveInput.x > 0)
-        {
-            transform.localScale = new Vector3(1, 1, 1);
-        }
-        else if (moveInput.x < 0)
-        {
-            transform.localScale = new Vector3(-1, 1, 1);
-        }
-        if (inputActions.Player.Attack.WasPressedThisFrame())
-        {
-            anim.SetTrigger("Attack");
-        }
-        UpdateAnimation();
+        inputActions.Player.Move.performed -= OnMove;
+        inputActions.Player.Move.canceled -= OnMove;
+
+        inputActions.Player.Attack.performed -= OnAttackPerformed;
+
+        inputActions.Disable();
+
+        if (health != null)
+            health.OnDeath -= HandleDeath;
     }
-    void FixedUpdate()
+    private void OnMove(InputAction.CallbackContext ctx)
     {
-        Vector2 moveAmount = moveInput.normalized * moveSpeed * Time.fixedDeltaTime;
-        rb.MovePosition(rb.position + moveAmount);
+        Debug.Log("OnMove CALLED: " + ctx.ReadValue<Vector2>());
+        moveInput = ctx.ReadValue<Vector2>();
     }
-    void UpdateAnimation()
+
+    private void Update()
     {
-        if (moveInput != Vector2.zero)
-        {
-            anim.SetFloat("MoveX", moveInput.x);
-            anim.SetFloat("MoveY", moveInput.y);
-            anim.SetBool("IsMoving", true);
-        }
-        else
-        {
-            anim.SetBool("IsMoving", false);
-        }
+        if (isDead) return;
+
+        if (moveInput.sqrMagnitude > 0.01f) lastMoveDir = moveInput.normalized;
+
+        UpdateAnimator();
+        if (attackTimer > 0f) attackTimer -= Time.deltaTime;
     }
+
+    private void FixedUpdate()
+    {
+        if (isDead || isAttacking) return;
+        rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
+    }
+
+    private void UpdateAnimator()
+    {
+        bool moving = moveInput.sqrMagnitude > 0.01f;
+        anim.SetFloat(HashMoveX, lastMoveDir.x);
+        anim.SetFloat(HashMoveY, lastMoveDir.y);
+        anim.SetBool(HashIsMoving, moving && !isAttacking);
+    }
+
+    private void OnAttackPerformed(InputAction.CallbackContext ctx)
+    {
+        if (isDead || attackTimer > 0f) return;
+
+        isAttacking = true;
+        attackTimer = attackCooldown;
+        PositionHitbox();
+        anim.SetTrigger(HashAttack);
+    }
+
+    private void PositionHitbox()
+    {
+        if (attackHitbox == null) return;
+        attackHitbox.transform.localPosition = lastMoveDir.normalized * 0.7f;
+    }
+
+    public void EnableHitbox()
+    {
+        if (attackHitbox != null)
+            attackHitbox.SetActive(true);
+    }
+
+    public void DisableHitbox()
+    {
+        if (attackHitbox != null)
+            attackHitbox.SetActive(false);
+    }
+    public void OnAttackEnd()
+    {
+        Debug.Log("Attack End CALLED");
+        isAttacking = false;
+
+        inputActions.Enable();
+    }
+
+    private void HandleDeath()
+    {
+        Debug.Log("HANDLE DEATH CALLED");
+        if (isDead) return;
+        isDead = true;
+
+        anim.SetTrigger(HashDie);
+        rb.linearVelocity = Vector2.zero;
+        rb.bodyType = RigidbodyType2D.Kinematic;
+
+        inputActions.Disable();
+        Invoke(nameof(TriggerGameOver), 1.5f);
+    }
+
+    private void TriggerGameOver()
+    {
+        GameManager.Instance.GameOver();
+    }
+    public int AttackDamage => attackDamage;
 }
